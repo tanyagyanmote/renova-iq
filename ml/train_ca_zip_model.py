@@ -37,11 +37,9 @@ def main():
 
     df = df[need].copy()
 
-    # numeric cleanup
     for c in ["price","bed","bath","house_size","acre_lot"]:
         df[c] = pd.to_numeric(df[c], errors="coerce")
 
-    # state + zip normalization
     df["state"] = df["state"].map(norm_state)
     df = df[df["state"] == "CA"].copy()
 
@@ -52,7 +50,7 @@ def main():
     df = df.dropna(subset=["price","house_size","bed","bath","zip3"])
     df["acre_lot"] = df["acre_lot"].fillna(0)
 
-    # clip crazy outliers to improve baseline
+    # remove crazy outliers
     df = df[(df["house_size"] >= 200) & (df["house_size"] <= 10000)]
     df = df[(df["price"] >= 50000) & (df["price"] <= 10_000_000)]
 
@@ -61,6 +59,7 @@ def main():
     cat = ["zip3"]
     X = df[num + cat]
     y = df["price"]
+
 
     pre = ColumnTransformer(
         [

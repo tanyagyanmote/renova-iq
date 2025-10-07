@@ -38,6 +38,11 @@ def to_float(x):
     except Exception:
         return None
 
+def _get_secret(name: str, default: str = "") -> str:
+    try:
+        return st.secrets.get(name, default)
+    except Exception:
+        return default
 
 @st.cache_resource(show_spinner=False)
 def load_model(path: str):
@@ -66,7 +71,7 @@ def predict_price(model, bed, bath, sqft, acre_lot, zip_code: str) -> float | No
 # Initialize session_state with stable keys
 # ---------------------------
 DEFAULTS = {
-    "api_key": os.getenv("ATTOM_API_KEY", ""),
+    "api_key": _get_secret("ATTOM_API_KEY", os.getenv("ATTOM_API_KEY", "")),
     "addr1": "1141 Langton Dr",
     "addr2": "San Ramon, CA 94582",
     "model_path": "ml/model_ca_zip_hgbr.joblib",
