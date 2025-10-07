@@ -1,59 +1,98 @@
-🏠 RenovaIQ — AI-Powered Home Value & ROI Estimator
+Renova-IQ — Flip Estimator (CA ZIP Model)
 
-RenovaIQ is an intelligent real estate analytics platform built around California housing data.
-It predicts current and post-renovation home values, simulates ROI for remodels, and integrates sustainability metrics, market trends, and neighborhood insights — empowering homeowners and investors to make smarter, data-driven renovation decisions.
+A simple Streamlit app to estimate renovation costs and flip math. Optionally train and use a California home-price model (zipcode-aware) to suggest ARV. ATTOM API can be used to prefill property facts, but it’s optional.
 
-✨ Key Features
+Features
 
-🏡 Property Value Estimation: Predicts current home value using machine learning trained on real California listings.
+Editable inputs for beds, baths, sqft, lot size, purchase price, carry costs, months, and ARV.
 
-🔧 Renovation ROI Simulator: Models the financial impact of renovations (kitchen, ADU, solar, etc.) and estimates payback periods.
+Renovation cost presets (Basic/Mid/High) with contingency and manual adjustments.
 
-🌿 Sustainability Analysis: Calculates energy and water savings for green upgrades and displays their long-term ROI.
+Optional ML model for ARV suggestion (HistGradientBoostingRegressor with ZIP3 one-hot).
 
-📊 Market Trend Insights: Shows price shifts based on interest rates, mortgage trends, and regional supply-demand data.
+Optional ATTOM fetch to prefill fields (never locks editing).
 
-📍 Neighborhood Analytics: Scores nearby schools, safety, walkability, and environmental risk factors to contextualize property value.
+Requirements
 
-🧠 Tech Stack
-Layer	Tools & Libraries
-Frontend	React + TypeScript, Tailwind CSS, ShadCN UI
-Backend	FastAPI / Node.js
-Machine Learning	Python, scikit-learn, XGBoost, pandas
-Database	PostgreSQL (with Prisma/SQLAlchemy)
-Visualization	Plotly, Matplotlib, SHAP for explainability
-Data Sources	Redfin Data Center, Zillow Research, California Housing Dataset
-⚙️ Setup & Installation
-# Clone the repository
-git clone https://github.com/yourusername/renovaiq.git
-cd renovaiq
+Python 3.10+ is recommended.
 
-# Backend setup
-cd backend
+Install dependencies:
+
 pip install -r requirements.txt
-uvicorn main:app --reload
-
-# Frontend setup
-cd ../frontend
-npm install
-npm run dev
 
 
-You can start with the built-in Scikit-Learn California dataset before integrating real Redfin or Zillow data.
+requirements.txt:
 
-🚀 Project Structure
-renovaiq/
-│
-├── frontend/                # React app (UI components, pages)
-│   ├── components/
-│   ├── pages/
-│   └── App.tsx
-│
-├── backend/                 # API and ML services
-│   ├── models/
-│   ├── routes/
-│   └── main.py
-│
-├── data/                    # Housing and neighborhood datasets
-├── notebooks/               # ML training & EDA
-└── README.md
+streamlit
+pandas
+numpy
+scikit-learn
+joblib
+requests
+
+Data for Training
+
+To train the model, you need a CSV with at least these columns:
+
+price (numeric)
+
+bed (numeric)
+
+bath (numeric)
+
+house_size (numeric, sqft)
+
+acre_lot (numeric, acres; missing allowed)
+
+zip_code (string or numeric; 5-digit ZIPs)
+
+state (string; includes “CA” rows)
+
+The training script filters to California (state == "CA"), normalizes ZIPs to 5-digit and derives zip3, drops rows with missing required fields, and clips extreme outliers.
+
+Train the Model
+
+Place your dataset at data/realtor-data.csv (or adjust the path), then run:
+
+python3 ml/train_ca_zip_model.py --csv data/realtor-data.csv --out ml/model_ca_zip_hgbr.joblib
+
+
+This prints metrics (MAE, R²) and saves a pipeline (preprocessing + model) to ml/model_ca_zip_hgbr.joblib.
+
+
+In the sidebar:
+
+Set the ML model path to ml/model_ca_zip_hgbr.joblib (or wherever you saved it).
+
+You can edit all fields freely at any time.
+
+Optional: ATTOM Prefill
+
+The app can call ATTOM to prefill address, beds, baths, sqft, and year. This is optional; you can use the app without any secrets.
+
+To enable ATTOM prefill, add your key to .streamlit/secrets.toml:
+
+ATTOM_API_KEY = "YOUR_ATTOM_KEY_HERE"
+
+
+Alternatively, set an environment variable:
+
+export ATTOM_API_KEY="YOUR_ATTOM_KEY_HERE"
+
+
+Then click “Fetch Property from ATTOM” in the app. The fetched values will prefill but remain editable.
+
+Project Structure 
+.
+├─ app/
+│  └─ app.py
+├─ ml/
+│  ├─ train_ca_zip_model.py
+│  └─ model_ca_zip_hgbr.joblib           # created by training step
+├─ data/
+│  └─ realtor-data.csv                   # your training data (not committed)
+├─ .streamlit/
+│  └─ secrets.toml                       # optional; for ATTOM_API_KEY
+├─ requirements.txt
+└─ README.md
+
