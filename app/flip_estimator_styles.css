@@ -1,0 +1,205 @@
+
+:root {
+    --background: #fafafa;
+    --foreground: #1a1a1a;
+    --card: #ffffff;
+    --border: #e5e5e5;
+    --muted-foreground: #737373;
+  
+    /* Accent family */
+    --sage: #8B9E8A;
+    --sage-light: #B8C5B7;
+    --sage-dark: #6B7C6A;
+    --terracotta: #C17B63;
+    --terracotta-light: #D9A092;
+    --terracotta-dark: #A86A54;
+    --dusty-rose: #C9989B;
+    --dusty-rose-light: #E5C1C3;
+    --warm-sand: #D4C4B0;
+    --warm-sand-light: #E8DDD0;
+    --slate-blue: #8E9AAF;
+    --slate-blue-light: #B8C2D4;
+  }
+  
+  /* Page base */
+  html, body {
+    background: var(--background);
+    color: var(--foreground);
+  }
+  
+  /* Subtle grid background helper */
+  .grid-background {
+    background-image:
+      linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    border-radius: 16px;
+  }
+  
+  /* Shell & section cards */
+  .app-shell {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+  }
+  
+  .card.accent-sand {
+    background: linear-gradient(180deg, #FAF8F5, #FFFFFF);
+    border-color: var(--warm-sand-light);
+  }
+  
+  .card.accent-sage {
+    background: linear-gradient(180deg, #F7F9F7, #FFFFFF);
+    border-color: var(--sage-light);
+  }
+  
+  .card.accent-rose {
+    background: linear-gradient(180deg, #FAF6F4, #FFFFFF);
+    border-color: var(--dusty-rose-light);
+  }
+  
+  /* Headings & captions */
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  
+  .section-hint {
+    color: var(--muted-foreground);
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+  }
+  
+  /* Metric row */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+  
+  .metric {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+  
+  .metric .label {
+    font-size: 12px;
+    color: var(--muted-foreground);
+    margin-bottom: 6px;
+  }
+  
+  .metric .value {
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Buttons (override Streamlit defaults) */
+  .stButton > button {
+    background: var(--sage);
+    color: #fff;
+    border: 1px solid var(--sage);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-weight: 600;
+    transition: transform .06s ease, box-shadow .12s ease;
+  }
+  
+  .stButton > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(139, 158, 138, 0.25);
+  }
+  
+  /* Inputs */
+  .stNumberInput input, .stTextInput input, .stTextArea textarea, .stSelectbox div[data-baseweb="select"] > div {
+    background: #fff !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+  }
+  
+  .stNumberInput input:focus, .stTextInput input:focus, .stTextArea textarea:focus {
+    border-color: var(--slate-blue) !important;
+    box-shadow: 0 8px 20px rgba(142,154,175,0.15) !important;
+  }
+  
+  /* Sliders (range inputs) — affects your custom range elements */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-track {
+    background: var(--border);
+    height: 6px;
+    border-radius: 4px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -6px;
+    background: linear-gradient(135deg, var(--terracotta) 0%, var(--terracotta-light) 100%);
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    box-shadow: 0 1px 3px rgba(193, 123, 99, 0.25);
+    transition: all 0.15s ease;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.08);
+    box-shadow: 0 2px 8px rgba(193, 123, 99, 0.35);
+  }
+  
+  /* Badges & tags */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    border: 1px solid var(--warm-sand-light);
+    background: #FBF7F7;
+    color: var(--terracotta-dark);
+  }
+  
+  /* Two-column helper */
+  .cols-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  
+  @media (max-width: 860px) {
+    .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cols-2 { grid-template-columns: 1fr; }
+  }
+  
+  /* Code block for showing JSON nicely inside expander */
+  .stMarkdown pre code, .stCodeBlock {
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  
+  /* Divider */
+  .hr {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+  
