@@ -1,8 +1,5 @@
-# app.py — Flip Estimator (refactor) + 401k-style theming
-
 import os
 import re
-import json
 import requests
 import joblib
 import pandas as pd
@@ -48,7 +45,7 @@ def predict_price(model, bed, bath, sqft, acre_lot, zip_code: str) -> float | No
             "house_size": float(sqft) if sqft is not None else None,
             "acre_lot": float(acre_lot) if acre_lot is not None else 0.0,
             "zip_code": str(zip_code) if zip_code else None,
-            "zip3": str(zip_code)[:3] if zip_code else None,  # important for your pipeline
+            "zip3": str(zip_code)[:3] if zip_code else None,
         }])
         return float(model.predict(row)[0])
     except Exception as e:
@@ -57,11 +54,10 @@ def predict_price(model, bed, bath, sqft, acre_lot, zip_code: str) -> float | No
 
 DEFAULTS = {
     "api_key": _get_secret("ATTOM_API_KEY", os.getenv("ATTOM_API_KEY", "")),
-    "addr1": "1141 Langton Dr",
+    "addr1": "1234 Langton Dr",
     "addr2": "San Ramon, CA 94582",
     "model_path": "ml/model_ca_zip_hgbr.joblib",
 
-    # property facts (editable)
     "one_line": "",
     "zip_code": "",
     "beds": 3,
@@ -70,7 +66,6 @@ DEFAULTS = {
     "acre_lot": 0.10,
     "year": None,
 
-    # model/cache
     "use_model_exit": False,
     "model_loaded": False,
     "last_attom_json": {},
@@ -78,9 +73,6 @@ DEFAULTS = {
 for k, v in DEFAULTS.items():
     st.session_state.setdefault(k, v)
 
-# ---------------------------
-# Sidebar (kept functional; gets styled by CSS)
-# ---------------------------
 st.sidebar.header("Setup")
 st.session_state.api_key = st.sidebar.text_input("ATTOM API key", value=st.session_state.api_key, type="password")
 st.session_state.addr1 = st.sidebar.text_input("Street (address1)", st.session_state.addr1)
@@ -101,17 +93,12 @@ else:
     st.session_state.model_loaded = False
     st.sidebar.info("Provide a trained model path (e.g., ml/model_ca_zip_hgbr.joblib)")
 
-# ===========================
-# Main content shell + cards
-# ===========================
 st.markdown('<div class="app-shell">', unsafe_allow_html=True)
 
-# ---- Header card
 st.title("Simple Flip Estimator (MVP) + CA ZIP Model")
 st.caption("Optionally fetch facts via ATTOM to prefill fields, then estimate value and run renovation what-ifs. All fields remain editable.")
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ---- ATTOM fetch card
 st.divider() 
 st.subheader("Prefill from ATTOM (optional)")
 c_fetch1, c_fetch2 = st.columns([1, 2])
@@ -135,7 +122,6 @@ with c_fetch1:
                     st.error(f"Request failed: {e}")
                     data = {}
 
-                # Parse safely and PREFILL session_state
                 try:
                     p = (data.get("property") or [])[0]
                     a = p.get("address", {}) or {}
@@ -167,7 +153,6 @@ with c_fetch1:
 with c_fetch2:
     st.text_input("Resolved Address", value=st.session_state.one_line or f"{st.session_state.addr1}, {st.session_state.addr2}", disabled=True)
 
-# ---- Property Snapshot card
 st.divider() 
 st.subheader("Property Snapshot (editable)")
 st.markdown('<div class="section-hint">Correct anything ATTOM guessed wrong — these drive both model & math.</div>', unsafe_allow_html=True)
@@ -186,6 +171,8 @@ l1.number_input("Lot size (acres)", min_value=0.0, step=0.01, format="%.2f", key
 with l2:
     st.caption("Rooms like offices may not count as bedrooms; feel free to correct the numbers.")
 st.markdown('</div>', unsafe_allow_html=True)
+
+# ---- Renovation Planner card
 
 st.divider() 
 st.subheader("Renovation Planner (CA costs)")
@@ -282,8 +269,6 @@ with st.expander("Adjustments (optional)"):
         st.caption(f"Applied adjustment: ${manual_adjust:,.0f}")
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ---- Deal Math card
-
 # ---- What-If card
 st.divider() 
 st.subheader("Renovation What-If (sqft add-on)")
@@ -296,7 +281,7 @@ include_in_total = w3.checkbox("Include in Total Reno Cost", value=False,
 
 capex = int(add_sqft * cost_per_sqft)
 
-# If you want the add-on to optionally change the computed total:
+# ---- Square Ft Add on
 total_with_addon = st.session_state.reno_cost + (capex if include_in_total else 0)
 
 st.markdown('<div class="metric-grid">', unsafe_allow_html=True)
@@ -312,7 +297,7 @@ for label, val in [
     </div>
     ''', unsafe_allow_html=True)
 
-st.markdown('</div>', unsafe_allow_html=True)  # close What-If card
+st.markdown('</div>', unsafe_allow_html=True) 
 
 # ---- Debug JSON card
 st.markdown('<div class="card">', unsafe_allow_html=True)
